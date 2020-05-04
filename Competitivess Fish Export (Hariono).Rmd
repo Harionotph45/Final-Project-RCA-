@@ -1,0 +1,322 @@
+---
+title: "Indonesian Shrimp Export to United States of America: Trends, Performance, and Competitiveness."
+author: "Hariono"
+date: "4/29/2020"
+output:
+  pdf_document: default
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+###Instal Usefull Package, For the first time running the code may be you need to install packages below, to run just delete the "#"
+#install.packages("kableExtra")
+#install.packages("tidyverse")
+#install.packages("dplyr")
+
+###Load Usefull Package
+library(kableExtra) ###Make a good table
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+
+```
+
+```{r import data, include=FALSE, echo=FALSE, warning=FALSE}
+###Import Usefull Data
+Indo_Import <- read_csv("https://raw.githubusercontent.com/Harionotph45/Final-Project-RCA-/master/Indo%20Import%20From%20US.csv") #This is data Indonesia Import from USA
+Indo_USVal <- read_csv("https://raw.githubusercontent.com/Harionotph45/Final-Project-RCA-/master/Indo%20to%20US%20Value.csv") #This is data Indonesia Export to USA (Value)
+Indo_USVol <- read_csv("https://raw.githubusercontent.com/Harionotph45/Final-Project-RCA-/master/Indo%20to%20US%20Volume.csv") #This is data Indonesia Export to USA (Volume)
+World_to_US <- read_csv("https://raw.githubusercontent.com/Harionotph45/Final-Project-RCA-/master/World%20to%20US.csv") #This is data World Export to USA (Value)
+Ref_HS <- read_csv("https://raw.githubusercontent.com/Harionotph45/Final-Project-RCA-/master/Ref%20HS%20Code.csv") #This is a reference of product code, so we know the Categories(Fish or not) and The Group Commodities (Ex: Shrimp, Tuna, Mollusk, etc), and the forms (ex: Frozen, Fresh, Prepared, etc)
+
+####NOTE : All of the value in the data is in thousands USD, and all of the volume is in Tons
+
+#Select Ref_HSCode column as needed
+Ref_HSCode <- Ref_HS %>% select("HS Code 6","Group_Commodities","Commodities","Form") ###The original Ref_HS data contains columns named in Indonesian language Which is we don't need in this analysis
+
+```
+
+```{r Customize The Analysis, include=FALSE, echo=FALSE, warning=FALSE}
+
+####Preparing data to check the avaibility of Group Commodities and Years to Analize
+###Join data Indonesia Export to US (Left Join, it will make more specific because Reference HS Code contains all goods exported to Indonesia not only to US) with HS Code and filtered only Fish Categories
+
+Indo_USVal_Check <- Indo_USVal %>% pivot_longer(cols = c(-`Product code`,-`Product label`,-`Categories`), names_to = "Year", 
+                                              values_to = "Value") %>%  left_join(Ref_HSCode,by = c("Product code"="HS Code 6"))%>% filter(Categories=="Fish")
+
+
+##### The Code allowed You to Costumize which Commodities and What Years You want to analyze
+
+##Customize the commodity to analyze
+a <- "Shrimp" ####This "a" is a group commodity name, you can change it to another commodity, to know what group commodities are available you can check with the code below :
+unique(Indo_USVal_Check$`Group_Commodities`)###This code will check the names of all group commodities, just choose and copy paste it and change the the definition of variable "a" above
+
+##Customize the range of year to analyze 
+yi <- 2008    ####This yi is the start of year you will analyze, you can change it as long as the data available
+yx <- 2018    ####This yx is the end of year you will analyze, you can change it so you don't need to worry if there is an update to the data 
+
+###To check what years are available to analyze you can run the code below :
+unique(Indo_USVal_Check$`Year`) ###You should aware that this will check only the year in data Indonesia export to US (Value), if you want to add a new updated year, please make sure you update all of the data, because some analysis needs more than one dataframe to run
+
+
+####NOTE : Bear in mind that the customize only works for figures and tables (the data presented, the title and the label will change according to your customization), but the manual analysis/arguments (which is typed manually) and the evidences to support the argument will not change, So you still need to  work on that.
+
+```
+
+### INTRODUCTION
+
+Fisheries are one of the most important sectors that supports more than 200 million livelihoods who work in harvesting, processing, marketing, distribution, and supply industries (FAO,2008). Fish is also source of protein for humans, providing ~20% of the animal protein consumed by more than 1.5 billion people in the world (FAO, 2008). In the last three decades, world food fish production from aquaculture has increased by almost 12 times, at an average annual rate of 8.8% (FAO, 2012).  Asia accounts for more than 87% of the world total fish production from aquaculture (FAO, 2012). It is About 38% of the fish and fishery produce are traded internationally(Anon, 2008). About half of the trade in fish and fishery products originated from developing countries and are destined for the developed markets of EU, USA and Japan (Anon, 2008). 
+
+As an archipelago, Indonesia has a great potential in the fisheries industry, especially because it has a fairly broad sea area 7.9 million km2, and coastline along the 80,791 km2 with extensive aquaculture and fish pond spread in some parts of the country. Indonesia has a vast 81 percent water area of the total area, so it is not impossible that Indonesia could rule the business world fisheries. Besides tuna, Indonesia is one of the world's largest shrimp exporting countries, especially to United States, Japan and EU markets (Wati, 2013). This study is an attempt to analyse the trend, performance and competitiveness of Indonesian’s shrimp exports to the United States market.
+
+### MATERIAL AND METHODS
+
+The export and import data were collected from the United Nations UNCOMTRADE statistical database. All of the values have been referred in US dollars and the volumes was in tons. Classification of HS Code to group commodities was based on the data from the Ministry of Marine Affairs and Fisheries. 
+
+Trade balance is the difference between Indonesia's exports to the USA and Indonesia's imports from the USA. It was calculated to analyze the bilateral trade patterns that occur between Indonesia and the United States for shrimp-based products.  The results would suggest either Indonesia is the major exporter or importer of shrimp to United States.
+
+Revealed Comparative Advantage (RCA),  one of the most popular method for studying comparative advantage of exports, was used  in this study. RCA use the trade pattern to identify the sectors in which an economy has a comparative advantage, by comparing the country of interests’ trade profile with the world average. The RCA index is defined as the ratio of two shares. The numerator is the share of a country’s total exports of the commodity of interest in its total exports. The denominator is share of world exports of the same commodity in total world exports. According to Balassa (1965), the formula to calculate the RCA is as follows:
+
+RCA=  (XJi/XJt )/(XWi/XWt )
+Where; 
+XJi 	=  Country J’s exports of good i
+XJt	= Country J’s total exports
+XWi	= Total world trade in good i
+XWt	= Total World Trade
+
+if RCA>1 then the good has comparative advantage, accelerating product for export oriented. But, if RCA < 1, the country is said to have a comparative disadvantage in the good or industry. 
+
+
+### RESULTS
+
+
+```{r create usefull function, include=FALSE, echo=FALSE, warning=FALSE}
+
+#Create Usefull Function
+##Create Function to Format number to Percent
+###Create Percentage Function, we use percent in some of analysis so make function to calculate percent is necessary
+percent <- function(x, digits = 2, 
+                    format = "f", ...) 
+  {paste0(formatC(100 * x, format = format, digits = digits, ...), "%")
+} # use the function by :  percent(x)
+
+###Create Function to Reduce Digits Number, the value in data is in thousands but it still very long digits, to make it easier to read lets make it in million
+million <- function(x){as.numeric(as.character((format(round(x / 1e3, 0),format = format))))
+  }###NOTE: this function just reduce 3 digits because the current data is already in 000 USD, Use the function by : million()
+
+```
+
+```{r prepared export all fish to usa in yx, include=FALSE, echo=FALSE, warning=FALSE}
+
+#We want to analyze what commodities exported from Indonesia to USA in the yx (year x, "look at chunk customize the Analysis" above to know the detail)
+### Because the data Indo_USVal doesn't have column categories (to filter only fish) and column group commodities, we need to look up at Ref_HSCode. So we left join the data 
+
+#Join Indo_USVal with HS Ref
+Indo_USVal_ref <- Indo_USVal %>% pivot_longer(cols = c(-`Product code`,-`Product label`,-`Categories`), ####We use pivot longer to make the data (year) possible to filter
+                                              names_to = "Year", 
+                                              values_to = "Value") %>%
+  left_join(Ref_HSCode,by = c("Product code"="HS Code 6"))
+
+#Now we only need column : Group Commodities, Value, and Percentage (will be used as inline code)   
+###Group and summarize data
+Indo_to_USVal <- Indo_USVal_ref %>% 
+  filter(Year== yx, Categories=="Fish") %>% ####Filtered by year and categories as explained before
+  group_by(Group_Commodities) %>%
+  summarise(Value_000USD = million(sum(Value)))%>% 
+  arrange(desc(Value_000USD)) %>%
+  mutate(Percentage = percent(Value_000USD/sum(Value_000USD)))%>%
+    mutate(Value_M = paste(Value_000USD,"Million")) ###This new column made just to be used for inline code,not in the plot
+
+####Calculate value of each commodities for inline codes
+TotalValue <- Indo_to_USVal %>% pull(Value_000USD) %>% sum()%>%paste(.,"Million") ###use paste to add needed information
+ValueShrimp <- Indo_to_USVal %>% filter(Group_Commodities=="Shrimp")%>% pull(Value_M)
+ValueCrabs <- Indo_to_USVal %>% filter(Group_Commodities=="Crabs" )%>% pull(Value_M)
+ValueTuna <- Indo_to_USVal %>% filter(Group_Commodities=="Tuna & Tuna Like Species")%>% pull(Value_M)
+ValueTilapia <- Indo_to_USVal %>% filter(Group_Commodities=="Tilapias" )%>% pull(Value_M)
+ValueMollusk <- Indo_to_USVal %>% filter(Group_Commodities=="Mollusk" )%>% pull(Value_M)
+ValueOtherFish <- Indo_to_USVal %>% filter(Group_Commodities=="Other Fish"   )%>% pull(Value_M)
+
+####Calculate Percentage of each commodities for inline codes
+PercentShrimp <- Indo_to_USVal %>% filter(Group_Commodities=="Shrimp")%>% pull(Percentage) 
+PercentCrabs <- Indo_to_USVal %>% filter(Group_Commodities=="Crabs" )%>% pull(Percentage)
+PercentTuna <- Indo_to_USVal %>% filter(Group_Commodities=="Tuna & Tuna Like Species")%>% pull(Percentage)
+PercentTilapia <- Indo_to_USVal %>% filter(Group_Commodities=="Tilapias" )%>% pull(Percentage)
+PercentMollusk <- Indo_to_USVal %>% filter(Group_Commodities=="Mollusk" )%>% pull(Percentage)
+PercentOtherFish <- Indo_to_USVal %>% filter(Group_Commodities=="Other Fish"   )%>% pull(Percentage)
+```
+
+In `r yx`, shrimp was accounted as the highest export value to the United States among the other commodites which is showed in  Figure 1. The total value of Indonesian’s fisheries products exported to the United States was `r TotalValue` USD, while  `r PercentShrimp` of them or `r ValueShrimp` USD was shrimp, and followed by crabs by `r PercentCrabs` or `r ValueCrabs` usd, Tuna & Tuna like species by `r PercentTuna` or `r ValueTuna` USD, Tilapia `r PercentTilapia` or `r ValueTuna` USD, Mollusk `r PercentMollusk` or `r ValueTuna` USD, and Other fish by `r PercentOtherFish` or `r ValueOtherFish` USD.
+
+```{r fig.1 export to usa in yx, echo=FALSE}
+###Plotting Composition of fish
+ggplot(Indo_to_USVal,aes(x=Group_Commodities,y=Value_000USD))+
+  geom_bar(stat="identity", fill="steelblue")+ labs(title= paste("Fig.1. Indonesian Fish Exported to USA \nBased on Group Commodities in ",yx),x="Group Commodities", y = "Value (Million US$)", color="") ###Use /n to wrap the title line, as the original line is very long, and use paste to combine variable and text, so that when commodities or year changed, the titlle would be changed too
+```
+
+
+```{r prepare fig2 trend volval, include=FALSE, echo=FALSE, warning=FALSE}
+##In this second figure we want to know the trend of group commodities "a" during year i to year x by volume and value, so first we need to join the data that contains value (Indo_USVal) and the data that contains volume (Indo_USVol) 
+
+##Before join those two tables, we need to make sure they have the same format, So we need to pivot longer the data Indo_USVol
+Indo_USDVol_longer <- Indo_USVol %>% pivot_longer(cols = c(-`Product code`,-`Product label`),
+                                        names_to = "Year", 
+                                        values_to = "Volume") 
+
+###Join data Volume and Value export to USA
+Indo_VOlVal <- Indo_USVal_ref %>% 
+  left_join(select(Indo_USDVol_longer,-`Product label`),
+            by = c("Product code"="Product code", "Year"="Year"))####Joining by based on two columns that should be the same on both dataframes (Product Code and Year)
+  
+```
+
+```{r composition forms, include=FALSE, echo=FALSE, warning=FALSE}
+##In this analysis we want to know what are forms (ex: frozen, dried, fresh, etc) of product a exported in the year x 
+## To do this we need to filter the data by commodites a and year x, and then make summarise that grouped by forms
+### Filter and Group the Data
+Indo_to_USVal_Form <- Indo_USVal_ref %>% 
+  filter(Year== yx, Categories=="Fish", Group_Commodities==a) %>%
+  group_by(Form) %>%
+  summarise(Value_000USD = million(sum(Value))) %>% 
+  arrange(desc(Value_000USD)) %>%
+  mutate(Proportion = Value_000USD/sum(Value_000USD))%>% ####To calculate the proportion of each form
+  mutate(Value_M = paste(Value_000USD,"Million")) ###add this to custumize the value and make it easier to use for inline code
+
+###Create variables needed for inline Code
+ValueFrozen <- Indo_to_USVal_Form %>%filter(Form=="Frozen") %>% pull(Value_M)
+ValuePrepared <- Indo_to_USVal_Form %>% filter(Form=="Prepared Or Preserved") %>% pull(Value_M)
+PercentFrozen <- Indo_to_USVal_Form %>% filter(Form=="Frozen") %>% pull(Proportion)%>%percent()
+PercentPrepared <- Indo_to_USVal_Form %>% filter(Form=="Prepared Or Preserved") %>% pull(Proportion)%>%percent()
+```
+
+
+Figure 2. shows that in general shrimp exports from Indonesia to the United States have increased in the last ten years (2008-2018) both in volume and value. However, the increase is more in terms of value than volume. Based on the further analysis, it is also suggest that the exported shrimp products was mostly frozen for about `r PercentFrozen` or `r ValueFrozen` USD, followed by prepared or preserved with proportion `r PercentPrepared` or `r ValuePrepared` USD, while other forms such as live, smoked, and dried  are each less than 1%.
+
+
+```{r fig2 trend volval, echo=FALSE}
+###We already prepared the data in chunk prepare fig2 above, Now we make a Plot from that dataframe
+###To plot trend of value and volume of commodities a during year i to year x we use ggplot
+Indo_VOlVal %>% filter(Group_Commodities==a, Year %in% (yi:yx))%>% #### this "%n%" means in between
+  select(Year,Value,Volume) %>% group_by(Year)%>% 
+  summarise(Value_USD = million(sum(Value)), Volume_Tons=million(sum(Volume))) %>%
+  ggplot(aes(x=Year, group=1))+geom_line(aes(y=Value_USD, colour = "Value (000 USD)"))+
+  geom_line(aes(y=Volume_Tons, colour = "Volume (Tons)"))+ ###geom_line two times because we have two data two plot which are value and volume
+  labs(title= paste("Fig.2. Performance of Indonesian",a,"export \nto USA during ",yi,"-",yx),x="Year", y = "Fish Exports;\n Value (Million $US), Volume (Tons)", color="") + scale_color_manual(labels = c(paste(a," export to USA (value)"), paste(a," export to USA (volume)")), values = c("blue", "red"))+ theme(legend.position="top") 
+```
+
+The trade balance shown in Table 1 revealed that net trade for shrimp-based fishery products exported from Indonesia to United States was positive. This indicates that even though there is a bilateral trade between Indonesia and the United States in shrimp products, Indonesia is a major exporter of shrimp to the United States rather than being an importer of shrimp from the United States.
+
+```{r prepared table1. trade balance, include=FALSE, echo=FALSE, warning=FALSE}
+###In this analysis, we want to create a table of trade balance, which will consist columns : Year, Export, Import, and Trade balance(Export-Import) 
+###Because data export and import in the separate dataframe, so we need to join it first
+#Before join table, we have to make sure it has the same columns, hence we Pivot Longer Data Import
+Indo_Import_longer <- Indo_Import %>% 
+  pivot_longer(cols = c(-`Product code`,-`Product label`),
+               names_to = "Year", values_to = "Import (US$") 
+
+#Join Data Export & Import
+Indo_ExIm <- Indo_USVal_ref %>% 
+  left_join(select(Indo_Import_longer,-`Product label`),
+            by = c("Product code"="Product code", "Year"="Year"))
+
+#Calculated Trade Balance 
+Indo_Balance <- Indo_ExIm %>% 
+  filter(Group_Commodities== a, Year %in% (yi:yx), Categories=="Fish") %>%
+  group_by(Year) %>%
+  summarise(Indo_Export_US = sum(Value),
+            Indo_Import_US = sum(`Import (US$`))%>% 
+  mutate("Trade Balance" = Indo_Export_US - Indo_Import_US)
+```
+
+```{r table1 trade balance, echo=FALSE}
+###We use kable to make a good table
+kable(Indo_Balance, booktabs = TRUE, caption = paste("Trade balance of ",a," between Indonesia and USA during ",yi,"-",yx), col.names = c("Year","Indonesia export (000 USD)", "Indonesia Import (000 USD)","Trade Balance (000 USD)"), escape = FALSE) %>%
+  kable_styling(font_size = 14, latex_options = "scale_down") 
+```
+
+```{r prepared fig. 3 RCA, include=FALSE, echo=FALSE, warning=FALSE}
+####In this last analysis we want to calculate RCA on each period (year)
+####The RCA calculation need 4 variable : total indonesian export to USA (commodities a), total indonesian export to USA (all goods), Total World export to US (commodities a), Total World export to US (commodities a)
+###First, we calculated all of those variables needed one by one
+
+###1Total Indonesia Export to US (Commodities a)
+Indo_a <- Indo_ExIm %>% filter(Group_Commodities == a) %>% 
+  group_by(Year) %>% summarise(Value = sum(Value))
+
+###2Total Indonesia Export to US (All Goods)
+Indo_all <- Indo_USVal_ref %>% filter(Categories=="All Goods") %>%
+  select(Year, Value)
+###3Total World Export to US (All Goods)
+World_all <- World_to_US %>% 
+  pivot_longer(cols = c(-`Code`,-`Product label`,-`Categories`),
+               names_to = "Year",
+               values_to = "Value") %>% 
+  filter(Code=="All Goods") %>% select(Year, Value)
+
+###4Total World Export to US (Commodities a)
+World_a <- World_to_US %>% pivot_longer(cols = c(-`Code`,-`Product label`,-`Categories`),
+                                        names_to = "Year", 
+                                        values_to = "Value") %>%
+  left_join(Ref_HSCode,by = c("Code"="HS Code 6")) %>%
+    filter(Group_Commodities == a) %>% select(Year, Value) %>%
+  group_by(Year) %>% summarise(Value = sum(Value))
+  
+
+###Calculate the RCA
+##Join all of the those 4 variables needed to one dataframe
+Indo_RCA <- Indo_a %>% 
+  left_join(Indo_all, by = c("Year"="Year")) %>%
+  left_join(World_a, by = c("Year"="Year")) %>%
+  left_join(World_all, by = c("Year"="Year")) %>% filter(Year %in% (yi:yx))%>%
+  mutate(RCA = round((Value.x / Value.y)/(Value.x.x / Value.y.y)),2)
+
+###Creates variables for inline code
+AverageRCA <- Indo_RCA %>% pull(RCA) %>% mean() %>% round(.,2)
+RCA2010 <- Indo_RCA %>% filter(Year==2010) %>% pull(RCA)
+RCA2018 <- Indo_RCA %>% filter(Year==2018) %>% pull(RCA)
+
+```
+The RCA of Indonesian shrimp exports to the United States are presented in Figure 3 revealed that it was highly positive (RCA> 1) with an average `r AverageRCA`. This shows that Indonesia has a strong comparative advantage in exporting shrimp to United States. Moreover, the figure also explain that generally in the last ten years, despite a gradual decreased from 2008 to 2010, the RCA  has increased from `r RCA2010` in 2010 to `r RCA2018` in 2018. 
+
+```{r fig. 3 RCA, echo=FALSE}
+###Plotting RCA
+ggplot(Indo_RCA,aes(x=Year,y=RCA))+ geom_point()+geom_text(aes(label=RCA),hjust=-0.5, vjust=1)+
+  labs(x="Year", y = "Revealed Comparative Advantage (RCA)") +ggtitle(paste("Fig.4. Revealed Comparative Advantage (RCA) of \n Indonesian's",a,"exports to USA during ",yi,"-",yx))
+```
+
+The best period is from 2010 to 2014 when the RCA continuously increased, while after 2014 it becomes volatile which tends to decline. The decrease in RCA could be caused by many factors such as the decrease in the volume of demand for frozen shrimp by the importing country, the rejection of Indonesian shrimp by the importing country as a result of antibiotic use, the high or low value of a country's GDP, and the limitations and rules set by the importing country (Mufa'ah, 2016). But specifically on the case of shrimp, Saputri (2017) suggest that the primary factor is the presence of large shrimp companies or suppliers from competing countries such as Vietnam and India. Those countries have become the largest shrimp exporter in the world which make the competition very tight and an obstacle for Indonesia. On the other hand, Indonesia is still lacking in the application of production technology. 
+
+Globalization makes the market compettition very hard these days. The free trade encourages every country in the world to take appropriate and effective steps to improve its competitiveness. Indonesia, with its natural resources and abundant workforce with competitive wages, which is a supporting factor for competitiveness, turns out to be insufficient to create competitive advantage. To improve competitiveness, Indonesia needs to conduct various evaluations and efforts so as not to lag behind competing countries.
+
+### CONCLUSION AND SUGGESTION
+
+Shrimp has the highest value among other fish commodities exported to United States. Most of shrimp products were exported in frozen and prepared or preserved. The positive trade balance also suggest that in the bilateral relations, Indonesia is a major exporter of shrimp to the United States. Furthermore, it revealed that shrimp is a highly competitive export commodity as the value of RCA is far greater than one. However, in the last five years, started from 2014, the RCA’s trend has fluctuated and tends to decrease due to the large amount of competition from shrimp suppliers from other countries such as Vietnam and India.
+
+One of the best way to increase the competitiveness of Indonesian shrimp commodities is by improve the quality and quantity of Shrimp. The provision of knowledge about intensive maintenance and handling to shrimp farmers and producers is needed, considering that shrimp is a perishable commodity. In addition, shrimp farmers or producers are also expected to be able to optimize value-added commodities. 
+
+### REFERENCES
+
+Anon. (2008). Fisheries and International Trade- Department for International Development (DFID) and
+    Marine Resources Assessment Group (MRAG)- Policy Brief 7, United Kingdom
+
+Balassa, Bela. (1965). "Trade Liberalisation and 'Revealed' Comparative Advantage". The
+    Manchester School of Economic and Social Studies, Vol. 33, Manchester, 1965, pp. 99-123.
+
+Food and Agriculture Organization (FAO). (2008). Climate change implications for fisheries and aquaculture. 
+    FAO Fisheries Aquaculture Technical Paper 530. Rome, Italy.
+
+Food and Agriculture Organization (FAO). (2012). The State of World Fisheries and Aquaculture. 10 p. FAO 
+    Organization of the United Nations, Rome 
+
+Mufa’ah, & Hayati, Mardiah. (2016). Analysis Of Export Competitiveness Of Indonesian Shrimp Commodities. 
+    AGRIFO Vol. 1 No.1. 
+
+Saputri, Karunia. (2016). Opportunities and Constraints of Indonesian Shrimp Exports to the Japanese Market. 
+    E- Mulawarman 5, 4, 1179-1194. 
+
+UNCOMTRADE. (2010-2018). United Nations Commodity Trade Statistics Database – 
+    get trade data (http://comtrade.un.org/db/dqQuickQuery.aspx)
+
+Wati, L.A., Wen, Chang, and Mustadjab, M. (2013). Competitiveness of Indonesian Shrimp Compare with Thailand Shrimp in Export Market. 
+    Wacana Vol. 16 No.1.
