@@ -300,6 +300,11 @@ One of the best ways to increase the competitiveness of Indonesian shrimp commod
 
 
 ### REFERENCES
+\begingroup
+\setlength{\parindent}{-0.5in}
+\setlength{\leftskip}{0.5in}
+\setlength{\parskip}{8pt}
+\noindent
 
 Anon. (2008). Fisheries and International Trade- Department for International Development (DFID) and
     Marine Resources Assessment Group (MRAG)- Policy Brief 7, United Kingdom
